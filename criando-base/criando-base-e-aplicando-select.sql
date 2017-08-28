@@ -1,0 +1,105 @@
+
+CREATE TABLE LIVROS (
+            livroId NUMBER(5) CONSTRAINT CN_LIVRO_ID_NN NOT NULL,
+            titulo VARCHAR2(30),
+            ediota VARCHAR2(30),
+            
+    CONSTRAINT CN_livroId_pk PRIMARY KEY (livroId)
+);
+
+
+CREATE TABLE LIVROS_AUTORES(
+              livroId NUMBER(5) NOT NULL,
+              nomeAutor VARCHAR2(30) CONSTRAINT CN_NOME_AUTO_NN NOT NULL,           
+            CONSTRAINT CN_LIVROID_FK FOREIGN KEY (livroId)
+    REFERENCES Livros(livroId)
+);
+
+
+
+CREATE TABLE EDITORAS(
+              editoraId NUMBER(5) NOT NULL,
+              endereco VARCHAR2(30) NOT NULL,
+              telefone NUMBER(9),
+              CONSTRAINT CN_EDITORAID_PK PRIMARY KEY (editoraId)
+              );
+
+              
+CREATE TABLE LIVROS_COPIAS(
+              livroId NUMBER(5) NOT NULL,
+              unidadeId NUMBER(5),
+              numCopias NUMBER(5) DEFAULT 0,
+              CONSTRAINT CN_LIVROIDD_FK FOREIGN KEY (livroId) REFERENCES LIVROS(livroId),
+              CONSTRAINT CN_UNIDADEID_PK PRIMARY KEY (unidadeId)
+              );
+
+
+CREATE TABLE BIBLIOTECAS(
+                        unidadeId NUMBER(5) NOT NULL,
+                        nome VARCHAR2(30),
+                        endereco VARCHAR2(30),
+                        CONSTRAINT CN_UNIDADE_PK PRIMARY KEY (unidadeId)
+                        );
+CREATE TABLE ALUNO(
+                  alunoId NUMBER(5),
+                  nome VARCHAR2(30),
+                  endereco VARCHAR2(30),
+                  telefone NUMBER(9),
+                  dataPenalidade DATE,
+                  qdeDiasMulta NUMBER(5),
+                  CONSTRAINT CN_ALUNOID_PK PRIMARY KEY (alunoId)
+                  );
+                        
+  
+
+CREATE TABLE LIVROS_EMPRESTIMOS(
+                      livroId NUMBER(5),
+                      unidadeId NUMBER(5),
+                      alunoId NUMBER(5),
+                      dataSaida DATE CONSTRAINT CN_DATASAIDA_NN NOT NULL,
+                      dataRetornoPrevista DATE CONSTRAINT CN_DATARETORNOPREVISTA_NN NOT NULL,
+                      dataRetorno DATE,
+                      CONSTRAINT CN_LIVROIDFK FOREIGN KEY (livroId) REFERENCES LIVROS(livroId),
+                      CONSTRAINT CN_UNIDADEDFK FOREIGN KEY (unidadeId) REFERENCES LIVROS_COPIAS(unidadeId),
+                      CONSTRAINT CN_ALUNOFK FOREIGN KEY (alunoId) REFERENCES ALUNO(alunoId)
+                      );
+                     
+                        
+                          
+INSERT INTO ALUNO VALUES(1, 'CIDAO', 'RUA 1', 97286665, NULL, NULL); 
+INSERT INTO ALUNO VALUES(2, 'JOAO', 'RUA 2', 972862365, '27/05/2017', 30); 
+INSERT INTO ALUNO VALUES(3, 'MARIA', 'RUA 3', 97286245, NULL, NULL); 
+INSERT INTO ALUNO VALUES(4, 'THIAGO', 'RUA 4', 972824665, '27/02/2017',15); 
+INSERT INTO ALUNO VALUES(5, 'THAISA', 'RUA 5', 9727465, NULL, NULL); 
+INSERT INTO ALUNO VALUES(6, 'MARCELO', 'RUA 6', 972853665, '10/03/2017', 10); 
+INSERT INTO ALUNO VALUES(7, 'ARTHUR', 'RUA 7', 97287565, '03/05/2017', 5); 
+INSERT INTO ALUNO VALUES(8, 'FRANCISCA', 'RUA ', 97299665, NULL, NULL); 
+INSERT INTO ALUNO VALUES(9, 'JUBILEU', 'RUA 9', 97288865, NULL, NULL); 
+INSERT INTO ALUNO VALUES(10, 'MARCINHA', 'RUA 10', 97277665, NULL, NULL); 
+INSERT INTO ALUNO VALUES(11, 'ABEL', 'RUA 11', 97284465, NULL, NULL); 
+
+INSERT INTO BIBLIOTECAS VALUES(1, 'UNICESUMAR','RUA X');
+INSERT INTO LIVROS VALUES(1,'O PRINCIPE' ,'COLOMBO'); 
+INSERT INTO LIVROS_COPIAS VALUES(1, 1,5);
+INSERT INTO LIVROS_EMPRESTIMOS VALUES (1, 1, 1, '20/03/2017', '25/03/2017', NULL);
+INSERT INTO LIVROS_EMPRESTIMOS VALUES (1, 1, 3, '20/03/2017', '28/03/2017', NULL);
+INSERT INTO LIVROS_EMPRESTIMOS VALUES (1, 1, 4, '20/03/2017', '29/03/2017', NULL);
+INSERT INTO LIVROS_EMPRESTIMOS VALUES (1, 1, 5, '20/03/2017', '25/03/2017', '25/03/2017');
+
+
+UPDATE ALUNO
+SET QDEDIASMULTA = 0
+WHERE ALUNOID = 2;
+
+DELETE FROM ALUNO
+WHERE ALUNOID = 11;
+
+
+SELECT * FROM LIVROS_EMPRESTIMOS
+WHERE dataRetornoPrevista < SYSDATE AND DATARETORNO IS  NULL;
+
+
+
+SELECT A.*, L.dataRetornoPrevista, L.DATARETORNO FROM ALUNO A INNER JOIN LIVROS_EMPRESTIMOS L 
+ON A.ALUNOID = L.ALUNOID 
+WHERE L.DATARETORNOPREVISTA < SYSDATE AND L.DATARETORNO IS NULL;
